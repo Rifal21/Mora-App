@@ -148,8 +148,8 @@ const pendingTransaction = ref(null)
 const modalMessage = ref('')
 const isProcessing = ref(false)
 const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY
-})
+    apiKey: useRuntimeConfig().public.groqApiKey, dangerouslyAllowBrowser:true
+});
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('id-ID').format(value)
