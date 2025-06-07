@@ -79,7 +79,7 @@
       </div>
 
       <!-- Quick Actions -->
-      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+      <!-- <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">Aksi Cepat</h2>
         <div class="flex flex-wrap gap-4">
           <NuxtLink 
@@ -110,7 +110,7 @@
             Refresh Data
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>

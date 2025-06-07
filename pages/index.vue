@@ -4,141 +4,216 @@
 
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Panel Chat -->
-                <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold text-blue-600 mb-4">Chat Mora</h2>
-
-<div class="chat-container max-h-[500px] overflow-y-auto mb-4 p-4 bg-gray-50 rounded-lg" ref="chatContainerRef">
-  <div 
-    v-for="(message, index) in chatHistory" 
-    :key="index"
-    :class="`mb-3 p-3 rounded-lg chat-message ${
-      message.role === 'user' 
-        ? 'bg-yellow-500 text-black ml-auto max-w-xs' 
-        : message.role === 'system'
-          ? 'bg-gray-200 text-gray-800 mx-auto max-w-md text-sm'
-          : 'bg-blue-600 text-white mr-auto max-w-xs'
-    }`"
-  >
-    {{ message.content }}
-  </div>
-</div>
-
-                    <ChatInput @send-message="handleSendMessage" />
+                <!-- Main Content (Financial Summary) -->
+                <div class="lg:col-span-2 order-2 lg:order-1">
+                    <FinancialSummary 
+                        :currentBalance="currentBalance"
+                        :income="income"
+                        :expenses="expenses"
+                        :recentTransactions="recentTransactions"
+                        :formatCurrency="formatCurrency"
+                    />
                 </div>
 
-                <!-- Ringkasan Keuangan -->
-<div class="bg-white rounded-lg shadow-md p-6">
-  <h2 class="text-2xl font-bold text-blue-800 mb-4 flex items-center">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    Ringkasan Keuangan
-  </h2>
+                <!-- Floating Chat Button (Mobile) -->
+                <button 
+                    @click="toggleChat"
+                    class="fixed bottom-6 right-6 lg:hidden z-40 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105"
+                    aria-label="Open Chat"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </button>
 
-  <div class="space-y-4">
-    <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-      <p class="text-gray-600 flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-        Saldo Bulan Ini
-      </p>
-      <p class="text-2xl font-bold text-gray-900">Rp {{ formatCurrency(currentBalance) }}</p>
-    </div>
+                <!-- Floating Chat Container -->
+                <!-- <div 
+                    class="fixed bottom-24 right-6 lg:relative lg:bottom-auto lg:right-auto w-full max-w-md lg:max-w-none lg:order-2 lg:col-span-1 transition-all duration-300 ease-in-out"
+                    :class="{
+                        'opacity-0 invisible translate-y-4 lg:translate-y-0 lg:opacity-100 lg:visible': !showChat,
+                        'opacity-100 visible translate-y-0': showChat
+                    }"
+                >
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 lg:rounded-lg lg:shadow-md">
+                        <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                            <h2 class="text-lg font-bold flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Mora AI
+                            </h2>
+                            <button 
+                                @click="toggleChat"
+                                class="lg:hidden text-white hover:text-blue-200"
+                                aria-label="Close Chat"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div 
+                            class="chat-container h-96 overflow-y-auto p-4 bg-gray-50"
+                            ref="chatContainerRef"
+                        >
+                            <div 
+                                v-for="(message, index) in chatHistory" 
+                                :key="index"
+                                class="mb-3 transition-all duration-200"
+                            >
+                                <div 
+                                    v-if="message.role === 'user'"
+                                    class="flex justify-end"
+                                >
+                                    <div class="max-w-xs lg:max-w-md bg-blue-600 text-white rounded-xl rounded-tr-none px-4 py-2 shadow-sm">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                    </div>
+                                </div>
+                                <div 
+                                    v-else-if="message.role === 'system'"
+                                    class="flex justify-center"
+                                >
+                                    <div class="max-w-md bg-gray-200 text-gray-800 rounded-lg px-3 py-2 text-sm text-center">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                    </div>
+                                </div>
+                                <div 
+                                    v-else
+                                    class="flex justify-start"
+                                >
+                                    <div class="max-w-xs lg:max-w-md bg-white border border-gray-200 rounded-xl rounded-tl-none px-4 py-2 shadow-sm">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                        <div v-if="message.isTyping" class="typing-indicator flex space-x-1 mt-1">
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 p-3 bg-white">
+                            <ChatInput @send-message="handleSendMessage" />
+                        </div>
+                    </div>
+                </div> -->
+            <!-- filepath: /home/rifalkur_/Desktop/IAM Project/mora-grok/pages/index.vue -->
+                <div 
+                    class="fixed bottom-24 right-3.5 lg:relative lg:bottom-auto lg:right-auto w-full max-w-md lg:max-w-none lg:order-2 lg:col-span-1 transition-all duration-300 ease-in-out"
+                    :class="{
+                        'opacity-0 invisible translate-y-4 lg:translate-y-0 lg:opacity-100 lg:visible': !showChat,
+                        'opacity-100 visible translate-y-0': showChat
+                    }"
+                    style="max-height: 80vh; width: calc(100% - 2rem);"
+                >
+                    <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 lg:rounded-lg lg:shadow-md">
+                        <!-- Chat Header -->
+                        <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                            <h2 class="text-lg font-bold flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Mora AI
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <!-- Button to navigate to Chat Page -->
+                                <button 
+                                    @click="$router.push('/chat')" 
+                                    class="bg-white text-blue-600 text-bold px-3 py-1 rounded-lg shadow hover:bg-gray-100 transition"
+                                    aria-label="Go to Chat Page"
+                                >
+                                    History Chat
+                                </button>
+                                <!-- Button to toggle chat visibility -->
+                                <button 
+                                    @click="toggleChat"
+                                    class="lg:hidden text-white hover:text-blue-200 hover:bg-red-500 rounded-lg p-1 transition"
+                                    aria-label="Close Chat"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <div class="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
-        <p class="text-gray-600">Total Pemasukan</p>
-        <p class="text-xl font-bold text-green-700">Rp {{ formatCurrency(income) }}</p>
-      </div>
+                        <!-- Chat Messages -->
+                        <div 
+                            class="chat-container h-96 overflow-y-auto p-4 bg-gray-50"
+                            ref="chatContainerRef"
+                        >
+                            <div 
+                                v-for="(message, index) in chatHistory" 
+                                :key="index"
+                                class="mb-3 transition-all duration-200"
+                            >
+                                <!-- User Message -->
+                                <div 
+                                    v-if="message.role === 'user'"
+                                    class="flex justify-end"
+                                >
+                                    <div class="max-w-xs lg:max-w-md bg-blue-600 text-white rounded-xl rounded-tr-none px-4 py-2 shadow-sm">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                    </div>
+                                </div>
 
-      <div class="p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border border-red-200">
-        <p class="text-gray-600">Total Pengeluaran</p>
-        <p class="text-xl font-bold text-red-700">Rp {{ formatCurrency(expenses) }}</p>
-      </div>
-    </div>
+                                <!-- System Message -->
+                                <div 
+                                    v-else-if="message.role === 'system'"
+                                    class="flex justify-center"
+                                >
+                                    <div class="max-w-md bg-gray-200 text-gray-800 rounded-lg px-3 py-2 text-sm text-center">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                    </div>
+                                </div>
 
-    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-      <p class="text-gray-600 mb-2">Transaksi Terakhir</p>
-      <div v-if="recentTransactions.length > 0" class="space-y-2">
-        <div 
-          v-for="transaction in recentTransactions" 
-          :key="transaction.id" 
-          class="flex justify-between items-center p-2 hover:bg-gray-100 rounded transition"
-        >
-          <div>
-            <p class="font-medium">{{ transaction.description }}</p>
-            <p class="text-xs text-gray-500">{{ new Date(transaction.date).toLocaleDateString('id-ID') }}</p>
-          </div>
-          <p :class="`font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`">
-            {{ transaction.type === 'income' ? '+' : '-' }}Rp {{ formatCurrency(transaction.amount) }}
-          </p>
+                                <!-- AI Message -->
+                                <div 
+                                    v-else
+                                    class="flex justify-start"
+                                >
+                                    <div class="max-w-xs lg:max-w-md bg-white border border-gray-200 rounded-xl rounded-tl-none px-4 py-2 shadow-sm">
+                                        <div v-html="formatMessage(message.content)"></div>
+                                        <div v-if="message.isTyping" class="typing-indicator flex space-x-1 mt-1">
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input -->
+                        <div class="border-t border-gray-200 p-3 bg-white">
+                            <ChatInput @send-message="handleSendMessage" />
+                        </div>
+                    </div>
+                </div>  
+              </div>
         </div>
-      </div>
-      <p v-else class="text-gray-500 text-sm">Belum ada transaksi</p>
-    </div>
-  </div>
-</div>
-            </div>
-        </div>
+
         <!-- Modal Konfirmasi -->
-<Transition name="fade">
-  <div v-if="showConfirmModal" class="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">{{ modalMessage }}</h3>
-      
-      <div v-if="pendingTransaction" class="space-y-3 mb-6">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Jumlah:</span>
-          <span :class="`font-semibold ${pendingTransaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`">
-            {{ pendingTransaction.type === 'income' ? '+' : '-' }}Rp {{ formatCurrency(pendingTransaction.amount) }}
-          </span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Keterangan:</span>
-          <span class="font-medium">{{ pendingTransaction.description }}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-600">Jenis:</span>
-          <span class="capitalize">{{ pendingTransaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran' }}</span>
-        </div>
-      </div>
-
-      <div class="flex justify-end space-x-3">
-        <button 
-          @click="showConfirmModal = false"
-          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-          :disabled="isProcessing"
-        >
-          Batal
-        </button>
-        <button 
-          @click="confirmSaveTransaction"
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center"
-          :disabled="isProcessing"
-        >
-          <span v-if="!isProcessing">Konfirmasi</span>
-          <svg v-else class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-</Transition>
+        <ConfirmModal 
+            v-if="showConfirmModal"
+            :message="modalMessage"
+            :transaction="pendingTransaction"
+            :isProcessing="isProcessing"
+            @cancel="showConfirmModal = false"
+            @confirm="confirmSaveTransaction"
+            :formatCurrency="formatCurrency"
+        />
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import Groq from 'groq-sdk'
 
 const supabase = useSupabaseClient()
 const { data: { user } } = await supabase.auth.getUser()
 const chatHistory = ref([])
-const chatContainerRef = ref(null); 
+const chatContainerRef = ref(null)
 const currentBalance = ref(0)
 const income = ref(0)
 const expenses = ref(0)
@@ -147,22 +222,95 @@ const showConfirmModal = ref(false)
 const pendingTransaction = ref(null)
 const modalMessage = ref('')
 const isProcessing = ref(false)
+const showChat = ref(false) // Controls chat visibility on mobile
 const groq = new Groq({
-    apiKey: useRuntimeConfig().public.groqApiKey, dangerouslyAllowBrowser:true
+    apiKey: useRuntimeConfig().public.groqApiKey, 
+    dangerouslyAllowBrowser: true
 });
+
+// Toggle chat visibility on mobile
+const toggleChat = () => {
+    showChat.value = !showChat.value
+    if (showChat.value) {
+        nextTick(() => {
+            scrollToLatestChat()
+        })
+    }
+}
+
+// Format message content with HTML tags
+const formatMessage = (content) => {
+    if (!content) return ''
+    
+    // Handle bold (**text**)
+    let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    
+    // Handle italic (*text* or _text_)
+    formatted = formatted.replace(/\*(.*?)\*|_(.*?)_/g, '<em>$1$2</em>')
+    
+    // Handle code blocks (`code`)
+    formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded">$1</code>')
+    
+    // Handle line breaks
+    formatted = formatted.replace(/\n/g, '<br>')
+    
+    return formatted
+}
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('id-ID').format(value)
 }
 
-// Fungsi untuk memproses pesan dengan Groq AI
+// Process message with Groq AI
 const processWithGroqAI = async (message) => {
     try {
+        const querySaldo = [
+            'saldo sekarang',
+            'berapa saldo saya',
+            'berapa saldo saya sekarang',
+            'berapa saldo saya saat ini',
+            'tampilkan saldo saya',
+            'tampilkan saldo saya sekarang',
+            'hitung saldo saya',
+            'cek saldo',
+            'saldo saya'
+        ];
+
+        // Cek apakah pesan pengguna cocok dengan salah satu kata kunci saldo
+        const isSaldoQuery = querySaldo.some(keyword => message.toLowerCase().includes(keyword.toLowerCase()));
+
+        if (isSaldoQuery) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('User not authenticated');
+
+            // Ambil data transaksi dari database
+            const { data: transactions, error } = await supabase
+                .from('transactions')
+                .select('amount, type')
+                .eq('user_id', user.id);
+
+            if (error) throw error;
+
+            // Hitung saldo saat ini
+            const currentBalance = transactions.reduce((acc, tx) => {
+                return tx.type === 'income' ? acc + tx.amount : acc - tx.amount;
+            }, 0);
+
+            return {
+                reply: `Saldo Anda saat ini adalah Rp ${formatCurrency(currentBalance)}.`,
+                transactionData: null // Tidak ada transaksi baru
+            };
+        }
         const completion = await groq.chat.completions.create({
             messages: [
                 {
                     role: "system",
-                    content: "Anda adalah asisten keuangan bernama Mora. Bantu pengguna mencatat transaksi dan berikan analisis keuangan."
+                    content: `Anda adalah asisten keuangan bernama Mora. Bantu pengguna mencatat transaksi dan berikan analisis keuangan. 
+                    Gunakan format markdown sederhana untuk penekanan teks:
+                    - **teks tebal** untuk poin penting
+                    - *teks miring* untuk penekanan halus
+                    - ` + '`kode`' + ` untuk nilai numerik atau istilah teknis
+                    Berikan respons yang jelas dan terstruktur.`
                 },
                 {
                     role: "user",
@@ -176,7 +324,7 @@ const processWithGroqAI = async (message) => {
 
         const response = completion.choices[0]?.message?.content || "Maaf, saya tidak bisa memproses permintaan Anda."
 
-        // Logika parsing transaksi
+        // Parse transaction data
         let transactionData = null
         const amountMatch = message.match(/Rp?\s?(\d+(?:\.\d+)?)/i) || 
                     message.match(/(\d+(?:\.\d+)?)\s?rupiah/i) || 
@@ -184,11 +332,13 @@ const processWithGroqAI = async (message) => {
         const amount = amountMatch ? parseFloat(amountMatch[1].replace('.', '')) : 0
 
         if (amount > 0) {
-            const description = message.match(/untuk\s(.+)/i)?.[1] || 'Transaksi'
+            const description = message.match(/untuk\s(.+)/i)?.[1] || 
+                             message.match(/beli\s(.+)/i)?.[1] || 
+                             'Transaksi'
             transactionData = {
                 amount,
-                description,
-                type: message.includes('pemasukan') ? 'income' : 'expense',
+                description: description.length > 50 ? description.substring(0, 50) + '...' : description,
+                type: message.includes('pemasukan') || message.includes('income') ? 'income' : 'expense',
                 date: new Date().toISOString()
             }
         }
@@ -206,62 +356,61 @@ const processWithGroqAI = async (message) => {
     }
 }
 
-// Fungsi untuk menyimpan chat (diperbarui)
+// Save chat message
 const saveChatMessage = async (chatData) => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) throw new Error('User not authenticated')
-    
-    const { data, error } = await supabase
-      .from('chat_history')
-      .insert({
-        user_id: user.id,
-        ...chatData
-      })
-      .select()
-      
-    if (error) throw error
-    
-    return data
-  } catch (error) {
-    console.error('Failed to save chat:', error)
-    throw error
-  }
+    try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error('User not authenticated')
+        
+        const { data, error } = await supabase
+            .from('chat_history')
+            .insert({
+                user_id: user.id,
+                ...chatData
+            })
+            .select()
+            
+        if (error) throw error
+        
+        return data
+    } catch (error) {
+        console.error('Failed to save chat:', error)
+        throw error
+    }
 }
 
-// Fungsi untuk menyimpan transaksi (diperbarui)
+// Save transaction
 const saveTransaction = async (transactionData) => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-  // Tambahkan pengecekan duplikasi sederhana
-  const similarTx = await supabase
-    .from('transactions')
-    .select('*')
-    .eq('amount', transactionData.amount)
-    .eq('description', transactionData.description)
-    .gte('created_at', new Date(Date.now() - 60000).toISOString()) // Cek 1 menit terakhir
-    .limit(1);
+    // Check for similar recent transactions
+    const similarTx = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('amount', transactionData.amount)
+        .eq('description', transactionData.description)
+        .gte('created_at', new Date(Date.now() - 60000).toISOString())
+        .limit(1);
 
-  if (similarTx.data?.length > 0) {
-    throw new Error('Transaksi serupa sudah tercatat');
-  }
+    if (similarTx.data?.length > 0) {
+        throw new Error('Transaksi serupa sudah tercatat');
+    }
 
-  const { data, error } = await supabase
-    .from('transactions')
-    .insert({
-      user_id: user.id,
-      ...transactionData
-    })
-    .select() // Penting untuk mendapatkan data yang baru disimpan
-    .single();
+    const { data, error } = await supabase
+        .from('transactions')
+        .insert({
+            user_id: user.id,
+            ...transactionData
+        })
+        .select()
+        .single();
 
-  if (error) throw error;
-  return data;
+    if (error) throw error;
+    return data;
 };
 
-// Fungsi untuk auto-scroll ke chat terbaru
+// Scroll to latest chat
 const scrollToLatestChat = () => {
     nextTick(() => {
         if (chatContainerRef.value) {
@@ -270,130 +419,151 @@ const scrollToLatestChat = () => {
     });
 };
 
-// Update handleSendMessage
+// Handle sending message with typing indicator
 const handleSendMessage = async (message) => {
-  try {
-    // 1. Tambahkan pesan user ke UI
-    const userMessage = { 
-      role: 'user', 
-      content: message,
-      timestamp: new Date().toISOString() 
+    try {
+        // Add user message
+        const userMessage = { 
+            role: 'user', 
+            content: message,
+            timestamp: new Date().toISOString() 
+        }
+        chatHistory.value.push(userMessage)
+        
+        // Show chat on mobile if not visible
+        if (!showChat.value) {
+            showChat.value = true
+        }
+        
+        scrollToLatestChat();
+
+        // Add typing indicator
+        const typingMessage = {
+            role: 'assistant',
+            content: '',
+            isTyping: true,
+            timestamp: new Date().toISOString()
+        }
+        chatHistory.value.push(typingMessage)
+        scrollToLatestChat();
+
+        // Process with AI
+        const aiResponse = await processWithGroqAI(message)
+        
+        // Save chat to database
+        await saveChatMessage({
+            user_message: message,
+            ai_response: aiResponse.reply,
+            is_transaction: !!aiResponse.transactionData
+        })
+        
+        // Replace typing indicator with actual response
+        const lastIndex = chatHistory.value.length - 1
+        chatHistory.value[lastIndex] = {
+            role: 'assistant',
+            content: aiResponse.reply,
+            isTyping: false,
+            timestamp: new Date().toISOString()
+        }
+
+        scrollToLatestChat();
+
+        // Show confirmation modal if transaction detected
+        if (aiResponse.transactionData) {
+            pendingTransaction.value = aiResponse.transactionData
+            modalMessage.value = aiResponse.transactionData.type === 'income' 
+                ? 'Konfirmasi Pemasukan Baru' 
+                : 'Konfirmasi Pengeluaran Baru'
+            showConfirmModal.value = true
+        }
+        
+    } catch (error) {
+        console.error('Error processing message:', error)
+        // Remove typing indicator if error occurs
+        chatHistory.value = chatHistory.value.filter(m => !m.isTyping)
+        
+        chatHistory.value.push({
+            role: 'system',
+            content: '⚠️ Gagal memproses pesan. Silakan coba lagi.',
+            timestamp: new Date().toISOString()
+        })
+        scrollToLatestChat();
     }
-    chatHistory.value.push(userMessage)
-
-    // 2. Proses dengan AI
-    const aiResponse = await processWithGroqAI(message)
-    
-    // 3. Simpan chat ke database
-    await saveChatMessage({
-      user_message: message,
-      ai_response: aiResponse.reply,
-      is_transaction: !!aiResponse.transactionData
-    })
-    
-    // 4. Tambahkan respon AI ke UI
-    chatHistory.value.push({
-      role: 'assistant',
-      content: aiResponse.reply,
-      timestamp: new Date().toISOString()
-    })
-
-    scrollToLatestChat();
-
-    // 5. Jika ada transaksi, tampilkan modal konfirmasi
-    if (aiResponse.transactionData) {
-      pendingTransaction.value = aiResponse.transactionData
-      modalMessage.value = aiResponse.transactionData.type === 'income' 
-        ? 'Konfirmasi Pemasukan Baru' 
-        : 'Konfirmasi Pengeluaran Baru'
-      showConfirmModal.value = true
-    }
-    
-  } catch (error) {
-    console.error('Error processing message:', error)
-    chatHistory.value.push({
-      role: 'system',
-      content: '⚠️ Gagal memproses pesan. Silakan coba lagi.',
-      timestamp: new Date().toISOString()
-    })
-    scrollToLatestChat();
-  }
 }
 
 const confirmSaveTransaction = async () => {
-  try {
-    isProcessing.value = true
-    
-    console.log('Attempting to save transaction:', pendingTransaction.value)
-    const savedTx = await saveTransaction(pendingTransaction.value)
-    console.log('Transaction saved:', savedTx)
-    
-    await updateFinancialSummary()
-    
-    // Tambahkan notifikasi ke chat
-    chatHistory.value.push({
-      role: 'system',
-      content: `✅ Transaksi ${pendingTransaction.value.type === 'income' ? 'pemasukan' : 'pengeluaran'} sebesar Rp ${formatCurrency(pendingTransaction.value.amount)} berhasil dicatat`,
-      timestamp: new Date().toISOString()
-    })
-    
-  } catch (error) {
-    console.error('Failed to save transaction:', error)
-    chatHistory.value.push({
-      role: 'system',
-      content: `⚠️ Gagal menyimpan transaksi: ${error.message}`,
-      timestamp: new Date().toISOString()
-    })
-  } finally {
-    isProcessing.value = false
-    showConfirmModal.value = false
-    pendingTransaction.value = null
-  }
+    try {
+        isProcessing.value = true
+        
+        const savedTx = await saveTransaction(pendingTransaction.value)
+        console.log('Transaction saved:', savedTx)
+        
+        await updateFinancialSummary()
+        
+        // Add notification to chat
+        chatHistory.value.push({
+            role: 'system',
+            content: `✅ Transaksi ${pendingTransaction.value.type === 'income' ? 'pemasukan' : 'pengeluaran'} sebesar Rp ${formatCurrency(pendingTransaction.value.amount)} berhasil dicatat`,
+            timestamp: new Date().toISOString()
+        })
+        
+        scrollToLatestChat();
+    } catch (error) {
+        console.error('Failed to save transaction:', error)
+        chatHistory.value.push({
+            role: 'system',
+            content: `⚠️ Gagal menyimpan transaksi: ${error.message}`,
+            timestamp: new Date().toISOString()
+        })
+        scrollToLatestChat();
+    } finally {
+        isProcessing.value = false
+        showConfirmModal.value = false
+        pendingTransaction.value = null
+    }
 }
 
-// Fungsi untuk memperbarui ringkasan keuangan
+// Update financial summary
 const updateFinancialSummary = async () => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-    // Gunakan transaksi untuk menghitung saldo secara real-time
-    const { data: transactions } = await supabase
-      .from('transactions')
-      .select('amount, type')
-      .eq('user_id', user.id);
+        const { data: transactions } = await supabase
+            .from('transactions')
+            .select('amount, type')
+            .eq('user_id', user.id);
 
-    const calculated = transactions.reduce((acc, tx) => {
-      if (tx.type === 'income') {
-        acc.balance += tx.amount;
-        acc.income += tx.amount;
-      } else {
-        acc.balance -= tx.amount;
-        acc.expenses += tx.amount;
-      }
-      return acc;
-    }, { balance: 0, income: 0, expenses: 0 });
+        const calculated = transactions.reduce((acc, tx) => {
+            if (tx.type === 'income') {
+                acc.balance += tx.amount;
+                acc.income += tx.amount;
+            } else {
+                acc.balance -= tx.amount;
+                acc.expenses += tx.amount;
+            }
+            return acc;
+        }, { balance: 0, income: 0, expenses: 0 });
 
-    currentBalance.value = calculated.balance;
-    income.value = calculated.income;
-    expenses.value = calculated.expenses;
+        currentBalance.value = calculated.balance;
+        income.value = calculated.income;
+        expenses.value = calculated.expenses;
 
-    // Ambil 5 transaksi terakhir untuk ditampilkan
-    const { data: recent } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(5);
+        const { data: recent } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(5);
 
-    recentTransactions.value = recent || [];
-    
-  } catch (error) {
-    console.error('Failed to update summary:', error);
-  }
+        recentTransactions.value = recent || [];
+        
+    } catch (error) {
+        console.error('Failed to update summary:', error);
+    }
 };
 
-// Muat riwayat chat saat komponen dimuat
+// Load initial data
 onMounted(async () => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN') {
@@ -401,17 +571,11 @@ onMounted(async () => {
         }
     })
 
-    // Panggil pertama kali jika sudah login
     if (user) {
         await updateFinancialSummary()
     }
 
-    // Jangan lupa unsubscribe saat komponen di-unmount
-    onBeforeUnmount(() => {
-        authListener?.unsubscribe()
-    })
-
-    // Muat riwayat chat dari database
+    // Load chat history
     const { data: chatData } = await supabase
         .from('chat_history')
         .select('*')
@@ -425,49 +589,81 @@ onMounted(async () => {
         ])
     }
 
+    // On desktop, show chat by default
+    if (window.innerWidth >= 1024) {
+        showChat.value = true
+    }
+
     scrollToLatestChat();
 })
 </script>
+
 <style scoped>
 .chat-container {
-  scrollbar-width: thin;
-  scrollbar-color: #3B82F6 #F3F4F6;
+    scrollbar-width: thin;
+    scrollbar-color: #3B82F6 #F3F4F6;
 }
 
 .chat-container::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .chat-container::-webkit-scrollbar-track {
-  background: #F3F4F6;
+    background: #F3F4F6;
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-  background-color: #3B82F6;
-  border-radius: 3px;
+    background-color: #3B82F6;
+    border-radius: 3px;
 }
 
+/* Typing indicator animation */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.typing-indicator div {
+    animation: bounce 1s infinite ease-in-out;
+}
+
+/* Smooth transitions for chat */
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-
-/* Animasi untuk pesan chat */
-.chat-message {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
+.fade-enter-from {
     opacity: 0;
     transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+}
+
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Message animations */
+.chat-message {
+    transition: all 0.3s ease;
+}
+
+.chat-message-enter-active {
+    transition: all 0.3s ease;
+}
+
+.chat-message-enter-from {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1023px) {
+    .chat-container {
+        max-height: 60vh;
+    }
 }
 </style>
