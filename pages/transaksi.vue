@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 mt-16 mb-16 sm:mt-0 sm:mb-0">
     <Navbar />
 
     <div class="container mx-auto px-4 py-8">

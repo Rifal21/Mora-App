@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxt/ui',
     '@nuxtjs/supabase',
+    '@pinia/nuxt',
   ],
 
   supabase: {
@@ -32,6 +33,7 @@ export default defineNuxtConfig({
       exclude: ['/', '/register', '/about', '/verify-email'],
     }
   },
+   pinia: {},
 
   runtimeConfig: {
     public: {

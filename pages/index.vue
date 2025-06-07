@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="mt-16 mb-16 sm:mt-0 sm:mb-0">
         <Navbar />
 
-        <div class="container mx-auto px-4 py-8">
+        <div class="container mx-auto px-4 pt-3 pb-5">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Main Content (Financial Summary) -->
                 <div class="lg:col-span-2 order-2 lg:order-1">
@@ -14,95 +14,11 @@
                         :formatCurrency="formatCurrency"
                     />
                 </div>
-
-                <!-- Floating Chat Button (Mobile) -->
-                <button 
-                    @click="toggleChat"
-                    class="fixed bottom-6 right-6 lg:hidden z-40 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:scale-105"
-                    aria-label="Open Chat"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                </button>
-
-                <!-- Floating Chat Container -->
-                <!-- <div 
-                    class="fixed bottom-24 right-6 lg:relative lg:bottom-auto lg:right-auto w-full max-w-md lg:max-w-none lg:order-2 lg:col-span-1 transition-all duration-300 ease-in-out"
-                    :class="{
-                        'opacity-0 invisible translate-y-4 lg:translate-y-0 lg:opacity-100 lg:visible': !showChat,
-                        'opacity-100 visible translate-y-0': showChat
-                    }"
-                >
-                    <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 lg:rounded-lg lg:shadow-md">
-                        <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
-                            <h2 class="text-lg font-bold flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                Mora AI
-                            </h2>
-                            <button 
-                                @click="toggleChat"
-                                class="lg:hidden text-white hover:text-blue-200"
-                                aria-label="Close Chat"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div 
-                            class="chat-container h-96 overflow-y-auto p-4 bg-gray-50"
-                            ref="chatContainerRef"
-                        >
-                            <div 
-                                v-for="(message, index) in chatHistory" 
-                                :key="index"
-                                class="mb-3 transition-all duration-200"
-                            >
-                                <div 
-                                    v-if="message.role === 'user'"
-                                    class="flex justify-end"
-                                >
-                                    <div class="max-w-xs lg:max-w-md bg-blue-600 text-white rounded-xl rounded-tr-none px-4 py-2 shadow-sm">
-                                        <div v-html="formatMessage(message.content)"></div>
-                                    </div>
-                                </div>
-                                <div 
-                                    v-else-if="message.role === 'system'"
-                                    class="flex justify-center"
-                                >
-                                    <div class="max-w-md bg-gray-200 text-gray-800 rounded-lg px-3 py-2 text-sm text-center">
-                                        <div v-html="formatMessage(message.content)"></div>
-                                    </div>
-                                </div>
-                                <div 
-                                    v-else
-                                    class="flex justify-start"
-                                >
-                                    <div class="max-w-xs lg:max-w-md bg-white border border-gray-200 rounded-xl rounded-tl-none px-4 py-2 shadow-sm">
-                                        <div v-html="formatMessage(message.content)"></div>
-                                        <div v-if="message.isTyping" class="typing-indicator flex space-x-1 mt-1">
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="border-t border-gray-200 p-3 bg-white">
-                            <ChatInput @send-message="handleSendMessage" />
-                        </div>
-                    </div>
-                </div> -->
-            <!-- filepath: /home/rifalkur_/Desktop/IAM Project/mora-grok/pages/index.vue -->
                 <div 
-                    class="fixed bottom-24 right-3.5 lg:relative lg:bottom-auto lg:right-auto w-full max-w-md lg:max-w-none lg:order-2 lg:col-span-1 transition-all duration-300 ease-in-out"
+                    class="fixed bottom-24 right-3.5 lg:relative lg:bottom-auto lg:right-auto w-full max-w-md lg:max-w-none lg:order-2 lg:col-span-1 transition-all duration-300 ease-in-out z-50"
                     :class="{
-                        'opacity-0 invisible translate-y-4 lg:translate-y-0 lg:opacity-100 lg:visible': !showChat,
-                        'opacity-100 visible translate-y-0': showChat
+                        'opacity-0 invisible translate-y-4 lg:translate-y-0 lg:opacity-100 lg:visible': !isChatOpen,
+                        'opacity-100 visible translate-y-0': isChatOpen
                     }"
                     style="max-height: 80vh; width: calc(100% - 2rem);"
                 >
@@ -126,7 +42,7 @@
                                 </button>
                                 <!-- Button to toggle chat visibility -->
                                 <button 
-                                    @click="toggleChat"
+                                    @click="isChatOpen = !isChatOpen"
                                     class="lg:hidden text-white hover:text-blue-200 hover:bg-red-500 rounded-lg p-1 transition"
                                     aria-label="Close Chat"
                                 >
@@ -210,6 +126,8 @@
 import { ref, onMounted, nextTick } from 'vue';
 import Groq from 'groq-sdk'
 import { IconHistory } from '@tabler/icons-vue';
+import { useChatStore } from '~/stores/chat';
+import {storeToRefs} from 'pinia'
 
 const supabase = useSupabaseClient()
 const { data: { user } } = await supabase.auth.getUser()
@@ -229,15 +147,8 @@ const groq = new Groq({
     dangerouslyAllowBrowser: true
 });
 
-// Toggle chat visibility on mobile
-const toggleChat = () => {
-    showChat.value = !showChat.value
-    if (showChat.value) {
-        nextTick(() => {
-            scrollToLatestChat()
-        })
-    }
-}
+const chatStore = useChatStore()
+const { isChatOpen } = storeToRefs(chatStore)
 
 // Format message content with HTML tags
 const formatMessage = (content) => {
