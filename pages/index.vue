@@ -122,7 +122,7 @@
                                     class="bg-white text-blue-600 text-bold px-3 py-1 rounded-lg shadow hover:bg-gray-100 transition"
                                     aria-label="Go to Chat Page"
                                 >
-                                    History Chat
+                                   <IconHistory class="w-6 h-6" />
                                 </button>
                                 <!-- Button to toggle chat visibility -->
                                 <button 
@@ -209,6 +209,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import Groq from 'groq-sdk'
+import { IconHistory } from '@tabler/icons-vue';
 
 const supabase = useSupabaseClient()
 const { data: { user } } = await supabase.auth.getUser()

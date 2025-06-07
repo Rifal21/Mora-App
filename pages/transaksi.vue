@@ -123,7 +123,7 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
                     :class="transaction.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                    {{ transaction.category || 'Lainnya' }}
+                    {{ transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran' }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm" 
@@ -132,7 +132,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <!-- <button @click="editTransaction(transaction)" class="text-mora-biru hover:text-blue-700 mr-3">Edit</button> -->
-                  <button @click="deleteTransaction(transaction.id)" class="text-red-600 hover:text-red-900">Hapus</button>
+                  <button @click="deleteTransaction(transaction.id)" class="text-red-600 hover:text-red-900"><IconTrash class="w-6 h-6" /></button>
                 </td>
               </tr>
               <tr v-if="filteredTransactions.length === 0">
@@ -195,6 +195,7 @@
 </template>
 
 <script setup>
+import { IconTrash } from '@tabler/icons-vue';
 const transactions = ref([]);
 const filterType = ref('all');
 const filterDate = ref('');

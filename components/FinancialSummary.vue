@@ -52,7 +52,7 @@
         </div>
         <p v-else class="text-gray-500 text-sm">Belum ada transaksi</p>
       </div>
-      <a href="/transaksi" class="block mt-4 text-blue-600 hover:underline text-end">Lihat semua transaksi →</a>
+      <a href="/transaksi" class="block mt-4 text-blue-600 hover:underline text-end text-sm">Lihat semua transaksi →</a>
     </div>
   </div>
 </template>

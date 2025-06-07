@@ -1,7 +1,7 @@
 <template>
   <nav class="bg-gray-50 text-black shadow-lg">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center py-4">
+      <div class="flex justify-between items-center py-4 md:flex-row md:space-x-6 flex-row-reverse">
         <div class="flex flex-col justify-center items-center">
           <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 sm:w-40 h-10 sm:h-14 object-cover rounded-md">
           <p class="text-[8px] sm:text-lg italic text-bold">"Cuan rapi, planning pasti!"</p>
@@ -15,7 +15,6 @@
           </NuxtLink>
           <NuxtLink to="/transaksi" class="hover:text-yellow-500 transition" active-class="text-yellow-500 font-bold">Transaksi</NuxtLink>
           
-          <!-- Profile Dropdown -->
           <div class="relative">
             <button 
               @click="toggleProfileDropdown" 
@@ -29,8 +28,7 @@
                 </svg>
             </div>
             </button>
-            
-            <!-- Dropdown Menu -->
+
             <div 
               v-if="isProfileDropdownOpen" 
               class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
@@ -40,7 +38,6 @@
                 <p class="text-xs text-gray-500 truncate">{{ user?.email || '' }}</p>
               </div>
               <div v-else>
-                <!-- tampilkan loader atau kosong -->
                 <p>Memuat data pengguna...</p>
               </div>
               <button 
@@ -63,12 +60,10 @@
         <div class="md:hidden">
           <button 
             @click="toggleMenu" 
-            class="flex items-center justify-center w-10 h-10 rounded-xl border-2 border-black bg-white text-black hover:bg-black hover:text-white transition duration-300 focus:outline-none cursor-pointer"
+            class="flex items-center justify-center w-10 h-10 rounded-xl border border-black bg-white text-black hover:bg-black hover:text-white transition duration-300 focus:outline-none cursor-pointer"
             aria-label="Toggle Menu"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+           <IconLayoutSidebarLeftExpand class="h-6 w-6" />
           </button>
         </div>
       </div>
@@ -201,6 +196,7 @@
 </template>
 
 <script setup>
+import { IconLayoutSidebarLeftExpand } from '@tabler/icons-vue';
 const isMenuOpen = ref(false);
 const isProfileModalOpen = ref(false);
 const isProfileDropdownOpen = ref(false);
