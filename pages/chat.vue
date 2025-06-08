@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-100 flex flex-col">
+  <div class="h-screen bg-gray-100 flex flex-col lg:mb-10 md:mb-24">
     <Navbar />
     
     <!-- Main Chat Container -->
-    <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6">
+    <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6 lg:mt-20">
       <!-- Chat Header -->
       <div class="bg-white rounded-t-lg shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
         <div class="flex items-center space-x-3">

@@ -150,7 +150,7 @@ export default {
         gradientExpense.addColorStop(1, 'rgba(239, 68, 68, 0)')
 
         chartInstance = new Chart(ctx, {
-          type: 'line',
+          type: 'bar',
           data: {
             labels: chartData.labels,
             datasets: [

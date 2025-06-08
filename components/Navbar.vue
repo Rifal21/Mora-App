@@ -3,11 +3,11 @@
     <div class="hidden md:block container mx-auto px-4">
       <div class="flex justify-between items-center py-4 md:flex-row md:space-x-6 flex-row-reverse">
         <div class="flex flex-col justify-center items-center">
-          <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 sm:w-40 h-10 sm:h-14 object-cover rounded-md">
-          <p class="text-[8px] sm:text-lg italic text-bold">"Cuan rapi, planning pasti!"</p>
+          <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 md:w-40 h-10 md:h-14 object-cover rounded-md">
+          <p class="text-[8px] md:text-lg italic text-bold">"Cuan rapi, planning pasti!"</p>
         </div>
 
-        <div class="hidden md:flex space-x-6 items-center">
+        <div class="hidden lg:flex space-x-6 items-center">
           <NuxtLink to="/" class="hover:text-yellow-500 transition" active-class="text-yellow-500 font-bold">Beranda</NuxtLink>
           <NuxtLink to="/dashboard" class="hover:text-yellow-500 transition"
               active-class="text-yellow-500 font-bold">
@@ -82,15 +82,15 @@
       >
         <div class="p-4">
           <div class="flex flex-col justify-center items-center bg-white rounded-xl mb-5 py-5">
-            <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 sm:w-40 h-10 sm:h-14 object-cover rounded-md">
-            <p class="text-[8px] sm:text-lg italic text-bold text-black">"Cuan rapi, planning pasti!"</p>
+            <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 md:w-40 h-10 md:h-14 object-cover rounded-md">
+            <p class="text-[8px] md:text-lg italic text-bold text-black">"Cuan rapi, planning pasti!"</p>
           </div>
-          <NuxtLink to="/" class="block py-2 hover:text-yellow-500 hover:bg-gray-50 p-2 rounded-lg" active-class="text-yellow-500 font-bold bg-gray-100 sm:bg-transparent">Beranda</NuxtLink>
+          <NuxtLink to="/" class="block py-2 hover:text-yellow-500 hover:bg-gray-50 p-2 rounded-lg" active-class="text-yellow-500 font-bold bg-gray-100 md:bg-transparent">Beranda</NuxtLink>
           <NuxtLink to="/dashboard" class="block py-2 hover:text-yellow-500 hover:bg-gray-50 p-2 rounded-lg transition"
-              active-class="text-yellow-500 font-bold bg-gray-100 sm:bg-transparent">
+              active-class="text-yellow-500 font-bold bg-gray-100 md:bg-transparent">
               Dashboard
           </NuxtLink>
-          <NuxtLink to="/transaksi" class="block py-2 hover:text-yellow-500 hover:bg-gray-50 p-2 rounded-lg" active-class="text-yellow-500 font-bold bg-gray-100 sm:bg-transparent">Transaksi</NuxtLink>
+          <NuxtLink to="/transaksi" class="block py-2 hover:text-yellow-500 hover:bg-gray-50 p-2 rounded-lg" active-class="text-yellow-500 font-bold bg-gray-100 md:bg-transparent">Transaksi</NuxtLink>
           
           <div class="mt-4 pt-4 border-t border-gray-700" >
             <div class="px-2 mb-3" v-if="user">
@@ -116,7 +116,7 @@
         </div>
       </div> -->
     </div>
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-50">
   <div class="flex justify-around items-center h-16 relative">
     <!-- Floating Chat Button (Centered) -->
     <button 
@@ -180,9 +180,9 @@
 </div>
 
     <!-- Mobile Header (Logo only) -->
-<div class="md:hidden flex flex-col items-center justify-center py-3 bg-white fixed top-0 left-0 right-0 z-50 shadow-md">
-  <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 sm:w-40 h-10 sm:h-14 object-cover rounded-md">
-  <p class="text-[8px] sm:text-lg italic text-bold">"Cuan rapi, planning pasti!"</p>
+<div class="lg:hidden flex flex-col items-center justify-center py-3 bg-white fixed top-0 left-0 right-0 z-50 shadow-md">
+  <img src="~/assets/images/logo/logo mora.png" alt="Mora" class="w-28 md:w-40 h-10 md:h-14 object-cover rounded-md">
+  <p class="text-[8px] md:text-lg italic text-bold">"Cuan rapi, planning pasti!"</p>
 </div>
 
     <!-- Profile Modal -->
