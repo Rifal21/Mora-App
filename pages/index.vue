@@ -51,7 +51,7 @@
                 <!-- Button to navigate to Chat Page -->
                 <button
                   @click="$router.push('/chat')"
-                  class="bg-white text-blue-600 text-bold px-3 py-1 rounded-lg shadow hover:bg-gray-100 transition"
+                  class="bg-white text-blue-600 text-bold px-3 py-1 rounded-lg shadow hover:bg-gray-100 transition cursor-pointer"
                   aria-label="Go to Chat Page"
                 >
                   <IconHistory class="w-6 h-6" />

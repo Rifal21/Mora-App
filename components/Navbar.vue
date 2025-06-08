@@ -120,7 +120,7 @@
   <div class="flex justify-around items-center h-16 relative">
     <!-- Floating Chat Button (Centered) -->
     <button 
-      @click="toggleChat"
+      @click="handleChatButtonClick"
       class="absolute left-1/2 transform -translate-x-1/2 -top-5 z-50 bg-white text-yellow-500 p-3 rounded-full shadow-xl hover:bg-black transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
       aria-label="Open Chat"
       style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);"
@@ -264,6 +264,7 @@
 <script setup>
 import { IconLayoutSidebarLeftExpand , IconCat } from '@tabler/icons-vue';
 import { useChatStore } from '~/stores/chat';
+import { useRouter, useRoute } from 'vue-router';
 const isMenuOpen = ref(false);
 const isProfileModalOpen = ref(false);
 const isProfileDropdownOpen = ref(false);
@@ -271,9 +272,18 @@ const supabase = useSupabaseClient();
 const router = useRouter();
 const { data: { user } } = await supabase.auth.getUser();
 
+const route = useRoute();
 const chatStore = useChatStore()
-const toggleChat = () => chatStore.toggleChat()
 
+const handleChatButtonClick = () => {
+  if (route.path === '/') {
+    // Jika di halaman index, gunakan toggleChat
+    chatStore.toggleChat();
+  } else {
+    // Jika bukan di halaman index, arahkan ke halaman /chat
+    router.push('/chat');
+  }
+};
 // Get user initials for avatar
 const userShortName = computed(() => {
   const name = user.value?.identities[0]?.identity_data?.name || '';

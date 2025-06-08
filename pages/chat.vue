@@ -1,9 +1,9 @@
 <template>
-  <div class="h-screen bg-gray-100 flex flex-col lg:mb-10 md:mb-24">
+  <div class="min-h-screen bg-gray-100 flex flex-col ">
     <Navbar />
     
     <!-- Main Chat Container -->
-    <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6 lg:mt-20">
+    <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 md:p-6 lg:pt-8 pt-24 pb-20">
       <!-- Chat Header -->
       <div class="bg-white rounded-t-lg shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
         <div class="flex items-center space-x-3">
@@ -201,37 +201,46 @@ const loadChatHistory = async () => {
 const processWithGroqAI = async (message) => {
   try {
     const querySaldo = [
-      'saldo sekarang',
-      'berapa saldo saya',
-      'berapa saldo saya sekarang',
-      'berapa saldo saya saat ini',
-      'tampilkan saldo saya',
-      'tampilkan saldo saya sekarang',
-      'hitung saldo saya',
-      'cek saldo',
-      'saldo saya'
+      "saldo sekarang",
+      "berapa saldo saya",
+      "berapa saldo saya sekarang",
+      "berapa saldo saya saat ini",
+      "tampilkan saldo saya",
+      "tampilkan saldo saya sekarang",
+      "hitung saldo saya",
+      "cek saldo",
+      "saldo saya",
     ];
 
-    // Check if user is asking about balance
-    const isSaldoQuery = querySaldo.some(keyword => 
+    // Cek apakah pesan pengguna cocok dengan salah satu kata kunci saldo
+    const isSaldoQuery = querySaldo.some((keyword) =>
       message.toLowerCase().includes(keyword.toLowerCase())
     );
 
     if (isSaldoQuery) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Ambil data transaksi dari database
       const { data: transactions, error } = await supabase
-        .from('transactions')
-        .select('amount, type')
-        .eq('user_id', user.id);
+        .from("transactions")
+        .select("amount, type")
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
+      // Hitung saldo saat ini
       const currentBalance = transactions.reduce((acc, tx) => {
-        return tx.type === 'income' ? acc + tx.amount : acc - tx.amount;
+        return tx.type === "income" ? acc + tx.amount : acc - tx.amount;
       }, 0);
 
       return {
-        reply: `Saldo Anda saat ini adalah **Rp ${formatCurrency(currentBalance)}**.`,
-        transactionData: null
+        reply: `Saldo Anda saat ini adalah Rp ${formatCurrency(
+          currentBalance
+        )}.`,
+        transactionData: null, // Tidak ada transaksi baru
       };
     }
 
@@ -239,108 +248,143 @@ const processWithGroqAI = async (message) => {
       messages: [
         {
           role: "system",
-          content: `Anda adalah asisten keuangan bernama Mora. Bantu pengguna mencatat transaksi dan berikan analisis keuangan. 
-          Gunakan format markdown sederhana untuk penekanan teks:
-          - **teks tebal** untuk poin penting
-          - *teks miring* untuk penekanan halus
-          - ` + '`kode`' + ` untuk nilai numerik atau istilah teknis
-          Berikan respons yang jelas dan terstruktur.`
+          content: `Anda adalah asisten keuangan bernama Mora. Ketika pengguna menyebutkan transaksi, WAJIB respons dengan format TEPAT berikut:
+Jumlah: [angka] (contoh: 500000)
+Jenis: [pemasukan/pengeluaran]
+Kategori: [nama kategori]
+Deskripsi: [deskripsi transaksi]
+
+Gunakan format di atas secara konsisten tanpa tanda bintang atau backtick.
+kemudian setelah format tersebut, tampilkan rekomendasi dan saran pengelolaan uang. jika pengguna tidak melakukan transaksi dan hanya meminta saran atau pendapat, jangan tampilkan format itu.`,
         },
         {
           role: "user",
-          content: message
-        }
+          content: message,
+        },
       ],
       model: "llama-3.3-70b-versatile",
       temperature: 0.3,
-      max_tokens: 1024
+      max_tokens: 1024,
     });
 
-    const response = completion.choices[0]?.message?.content || "Maaf, saya tidak bisa memproses permintaan Anda.";
+    const response =
+      completion.choices[0]?.message?.content ||
+      "Maaf, saya tidak bisa memproses permintaan Anda.";
+    console.log("Raw AI Response:", response);
 
-    // Parse transaction data
+    // Parse transaction data dengan regex yang lebih sederhana
     let transactionData = null;
-    const amountMatch = message.match(/Rp?\s?(\d+(?:\.\d+)?)/i) || 
-                message.match(/(\d+(?:\.\d+)?)\s?rupiah/i) || 
-                message.match(/(\d+(?:\.\d+)?)/i);
-    const amount = amountMatch ? parseFloat(amountMatch[1].replace('.', '')) : 0;
+
+    // 1. Ekstrak jumlah (format: Jumlah: 5000000)
+    const amountMatch = response.match(/Jumlah:\s*(\d+)/i);
+    const amount = amountMatch ? parseInt(amountMatch[1]) : 0;
+    console.log("Extracted amount:", amount);
+
+    // 2. Ekstrak jenis transaksi
+    const typeMatch = response.match(/Jenis:\s*(pemasukan|pengeluaran)/i);
+    const type = typeMatch
+      ? typeMatch[1].toLowerCase()
+      : message.toLowerCase().includes("pemasukan")
+      ? "income"
+      : "expense";
+
+    // 3. Ekstrak kategori
+    const categoryMatch = response.match(/Kategori:\s*(.+)/i);
+    const category = categoryMatch ? categoryMatch[1].trim() : "Lainnya";
+
+    // 4. Ekstrak deskripsi
+    const descriptionMatch = response.match(/Deskripsi:\s*(.+)/i);
+    const description = descriptionMatch
+      ? descriptionMatch[1].trim()
+      : message.match(/untuk\s(.+)/i)?.[1] ||
+        message.match(/beli\s(.+)/i)?.[1] ||
+        "Transaksi";
 
     if (amount > 0) {
-      const description = message.match(/untuk\s(.+)/i)?.[1] || 
-                       message.match(/beli\s(.+)/i)?.[1] || 
-                       'Transaksi';
       transactionData = {
         amount,
-        description: description.length > 50 ? description.substring(0, 50) + '...' : description,
-        type: message.includes('pemasukan') || message.includes('income') ? 'income' : 'expense',
-        date: new Date().toISOString()
+        description:
+          description.length > 50
+            ? description.substring(0, 50) + "..."
+            : description,
+        category:
+          category.length > 50 ? category.substring(0, 50) + "..." : category,
+        type: type === "pemasukan" ? "income" : "expense",
+        date: new Date().toISOString(),
       };
+      console.log("Transaction Data:", transactionData);
+    } else {
+      console.log("No valid transaction data extracted");
     }
 
     return {
       reply: response,
-      transactionData
+      transactionData,
     };
-
   } catch (error) {
-    console.error('Groq AI Error:', error);
+    console.error("Groq AI Error:", error);
     return {
-      reply: 'Maaf, terjadi kesalahan saat memproses permintaan Anda.'
+      reply: "Maaf, terjadi kesalahan saat memproses permintaan Anda.",
     };
   }
 };
 
-// Save chat message to database
+// Save chat message
 const saveChatMessage = async (chatData) => {
   try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("User not authenticated");
+
     const { data, error } = await supabase
-      .from('chat_history')
+      .from("chat_history")
       .insert({
         user_id: user.id,
-        ...chatData
+        ...chatData,
       })
       .select();
 
     if (error) throw error;
+
     return data;
   } catch (error) {
-    console.error('Failed to save chat:', error);
+    console.error("Failed to save chat:", error);
     throw error;
   }
 };
 
-// Save transaction to database
+// Save transaction
 const saveTransaction = async (transactionData) => {
-  try {
-    // Check for duplicate transactions
-    const { data: similarTx, error: similarError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('amount', transactionData.amount)
-      .eq('description', transactionData.description)
-      .gte('created_at', new Date(Date.now() - 60000).toISOString())
-      .limit(1);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("User not authenticated");
 
-    if (similarError) throw similarError;
-    if (similarTx?.length > 0) {
-      throw new Error('Transaksi serupa sudah tercatat');
-    }
+  // Check for similar recent transactions
+  const similarTx = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("amount", transactionData.amount)
+    .eq("description", transactionData.description)
+    .gte("created_at", new Date(Date.now() - 60000).toISOString())
+    .limit(1);
 
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert({
-        user_id: user.id,
-        ...transactionData
-      })
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Failed to save transaction:', error);
-    throw error;
+  if (similarTx.data?.length > 0) {
+    throw new Error("Transaksi serupa sudah tercatat");
   }
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .insert({
+      user_id: user.id,
+      ...transactionData,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 };
 
 // Scroll to bottom of chat
@@ -354,102 +398,189 @@ const scrollToBottom = () => {
 
 // Handle sending messages
 const handleSendMessage = async (message) => {
-  if (!message.trim()) return;
-  
   try {
     // Add user message
     const userMessage = {
-      role: 'user',
+      role: "user",
       content: message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     chatHistory.value.push(userMessage);
-    scrollToBottom();
-    
-    // Show typing indicator
-    isAiResponding.value = true;
+
+    // Show chat on mobile if not visible
+    // if (!showChat.value) {
+    //   showChat.value = true;
+    // }
+
+    scrollToLatestChat();
+
+    // Add typing indicator
     const typingMessage = {
-      role: 'assistant',
-      content: '',
+      role: "assistant",
+      content: "",
       isTyping: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     chatHistory.value.push(typingMessage);
-    scrollToBottom();
+    scrollToLatestChat();
 
     // Process with AI
     const aiResponse = await processWithGroqAI(message);
-    
+
     // Save chat to database
     await saveChatMessage({
       user_message: message,
       ai_response: aiResponse.reply,
-      is_transaction: !!aiResponse.transactionData
+      is_transaction: !!aiResponse.transactionData,
     });
-    
+
     // Replace typing indicator with actual response
     const lastIndex = chatHistory.value.length - 1;
     chatHistory.value[lastIndex] = {
-      role: 'assistant',
+      role: "assistant",
       content: aiResponse.reply,
       isTyping: false,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    isAiResponding.value = false;
-    scrollToBottom();
+
+    scrollToLatestChat();
 
     // Show confirmation modal if transaction detected
     if (aiResponse.transactionData) {
-      pendingTransaction.value = aiResponse.transactionData;
-      modalMessage.value = aiResponse.transactionData.type === 'income' 
-        ? 'Konfirmasi Pemasukan Baru' 
-        : 'Konfirmasi Pengeluaran Baru';
+      // Format transaction data for display
+      const formattedTransaction = {
+        ...aiResponse.transactionData,
+        formattedAmount: formatCurrency(aiResponse.transactionData.amount),
+      };
+
+      pendingTransaction.value = formattedTransaction;
+      modalMessage.value =
+        aiResponse.transactionData.type === "income"
+          ? "Konfirmasi Pemasukan Baru"
+          : "Konfirmasi Pengeluaran Baru";
       showConfirmModal.value = true;
+
+      // Add confirmation message to chat
+      chatHistory.value.push({
+        role: "system",
+        content: `Silakan konfirmasi ${
+          aiResponse.transactionData.type === "income"
+            ? "pemasukan"
+            : "pengeluaran"
+        } sebesar Rp ${formattedTransaction.formattedAmount} untuk ${
+          aiResponse.transactionData.description
+        }`,
+        timestamp: new Date().toISOString(),
+      });
+      scrollToLatestChat();
     }
-    
   } catch (error) {
-    console.error('Error processing message:', error);
+    console.error("Error processing message:", error);
     // Remove typing indicator if error occurs
-    chatHistory.value = chatHistory.value.filter(m => !m.isTyping);
-    isAiResponding.value = false;
-    
+    chatHistory.value = chatHistory.value.filter((m) => !m.isTyping);
+
     chatHistory.value.push({
-      role: 'system',
-      content: '⚠️ Gagal memproses pesan. Silakan coba lagi.',
-      timestamp: new Date().toISOString()
+      role: "system",
+      content: "⚠️ Gagal memproses pesan. Silakan coba lagi.",
+      timestamp: new Date().toISOString(),
     });
-    scrollToBottom();
+    scrollToLatestChat();
   }
 };
 
-// Confirm and save transaction
 const confirmSaveTransaction = async () => {
   try {
     isProcessing.value = true;
-    const savedTx = await saveTransaction(pendingTransaction.value);
-    console.log('Transaction saved:', savedTx);
-    
+
+    // Pastikan kita menggunakan data mentah (tanpa formattedAmount) untuk disimpan
+    const txToSave = {
+      ...pendingTransaction.value,
+      formattedAmount: undefined, // Hapus properti yang tidak diperlukan
+    };
+
+    const savedTx = await saveTransaction(txToSave);
+    console.log("Transaction saved:", savedTx);
+
+    await updateFinancialSummary();
+
     // Add notification to chat
     chatHistory.value.push({
-      role: 'system',
-      content: `✅ Transaksi ${pendingTransaction.value.type === 'income' ? 'pemasukan' : 'pengeluaran'} sebesar Rp ${formatCurrency(pendingTransaction.value.amount)} berhasil dicatat`,
-      timestamp: new Date().toISOString()
+      role: "system",
+      content: `✅ Transaksi ${
+        pendingTransaction.value.type === "income" ? "pemasukan" : "pengeluaran"
+      } sebesar Rp ${pendingTransaction.value.formattedAmount} untuk "${
+        pendingTransaction.value.description
+      }" berhasil dicatat`,
+      timestamp: new Date().toISOString(),
     });
-    scrollToBottom();
+
+    scrollToLatestChat();
   } catch (error) {
-    console.error('Failed to save transaction:', error);
+    console.error("Failed to save transaction:", error);
     chatHistory.value.push({
-      role: 'system',
+      role: "system",
       content: `⚠️ Gagal menyimpan transaksi: ${error.message}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-    scrollToBottom();
+    scrollToLatestChat();
   } finally {
     isProcessing.value = false;
     showConfirmModal.value = false;
     pendingTransaction.value = null;
   }
 };
+
+
+const scrollToLatestChat = () => {
+  nextTick(() => {
+    if (chatContainerRef.value) {
+      chatContainerRef.value.scrollTop = chatContainerRef.value.scrollHeight;
+    }
+  });
+};
+const updateFinancialSummary = async () => {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: transactions } = await supabase
+      .from("transactions")
+      .select("amount, type")
+      .eq("user_id", user.id);
+
+    const calculated = transactions.reduce(
+      (acc, tx) => {
+        if (tx.type === "income") {
+          acc.balance += tx.amount;
+          acc.income += tx.amount;
+        } else {
+          acc.balance -= tx.amount;
+          acc.expenses += tx.amount;
+        }
+        return acc;
+      },
+      { balance: 0, income: 0, expenses: 0 }
+    );
+
+    currentBalance.value = calculated.balance;
+    income.value = calculated.income;
+    expenses.value = calculated.expenses;
+
+    const { data: recent } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    recentTransactions.value = recent || [];
+  } catch (error) {
+    console.error("Failed to update summary:", error);
+  }
+};
+
 
 // Load initial data
 onMounted(async () => {
