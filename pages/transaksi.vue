@@ -251,8 +251,8 @@ const filteredTransactions = computed(() => {
 
 const totalIncome = computed(() => {
   return transactions.value
-    .filter(t => t.amount > 0)
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 });
 
 const totalExpense = computed(() => {
@@ -262,8 +262,9 @@ const totalExpense = computed(() => {
 });
 
 const totalBalance = computed(() => {
-  return transactions.value
-    .reduce((sum, t) => sum + t.amount, 0);
+  return transactions.value.reduce((acc, tx) => {
+        return tx.type === "income" ? acc + tx.amount : acc - tx.amount;
+      }, 0);
 });
 
 const totalTransactions = computed(() => {
@@ -331,6 +332,16 @@ const deleteTransaction = async (id) => {
 // Initial fetch
 onMounted(async () => {
   await fetchTransactions();
+    const supabase = useSupabaseClient();
+  supabase
+    .channel('transactions')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+      console.log('Realtime update:', payload);
+
+      // Fetch updated transactions
+      fetchTransactions();
+    })
+    .subscribe();
 });
 </script>
 

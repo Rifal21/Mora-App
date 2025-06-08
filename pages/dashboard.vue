@@ -151,32 +151,6 @@
             </div>
             <TransactionList :transactions="recentTransactions" />
           </div>
-
-          <!-- Budget Overview -->
-          <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-xs">
-            <h2 class="text-lg font-semibold text-gray-800 flex items-center mb-6">
-              <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                </svg>
-              </div>
-              Ringkasan Anggaran
-            </h2>
-            <div class="space-y-4">
-              <div v-for="category in budgetCategories" :key="category.name" class="flex flex-col">
-                <div class="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>{{ category.name }}</span>
-                  <span>{{ category.used }}/{{ category.total }}</span>
-                </div>
-                <div class="w-full bg-gray-100 rounded-full h-1.5">
-                  <div 
-                    :class="`h-1.5 rounded-full ${category.percentage >= 80 ? 'bg-red-500' : category.percentage >= 50 ? 'bg-yellow-500' : 'bg-green-500'}`" 
-                    :style="`width: ${Math.min(category.percentage, 100)}%`"
-                  ></div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -201,13 +175,6 @@ const lastUpdated = ref(new Date().toLocaleDateString('id-ID', {
 }))
 const chartRange = ref('30')
 
-// Sample budget data
-const budgetCategories = ref([
-  { name: 'Makanan & Minuman', used: 1200000, total: 1500000, percentage: 80 },
-  { name: 'Transportasi', used: 450000, total: 1000000, percentage: 45 },
-  { name: 'Hiburan', used: 300000, total: 500000, percentage: 60 },
-  { name: 'Tagihan', used: 1800000, total: 2000000, percentage: 90 }
-])
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value)
@@ -286,5 +253,15 @@ onMounted(async () => {
       loadData()
     }
   })
+
+    supabase
+    .channel('transactions')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+      console.log('Realtime update:', payload);
+
+      // Update financial summary when transactions change
+      loadData();
+    })
+    .subscribe();
 })
 </script>

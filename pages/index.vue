@@ -592,6 +592,7 @@ const updateFinancialSummary = async () => {
   } catch (error) {
     console.error("Failed to update summary:", error);
   }
+  
 };
 
 // Load initial data
@@ -628,6 +629,17 @@ onMounted(async () => {
   }
 
   scrollToLatestChat();
+
+   // Realtime listener for transactions
+  supabase
+    .channel('transactions')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+      console.log('Realtime update:', payload);
+
+      // Update financial summary when transactions change
+      updateFinancialSummary();
+    })
+    .subscribe();
 });
 </script>
 
