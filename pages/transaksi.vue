@@ -55,7 +55,7 @@
       </div>
 
       <!-- Stats Summary -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
           <div class="flex justify-between items-start">
             <div>
@@ -97,7 +97,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Transactions Table -->
       <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -225,7 +225,7 @@ const filteredTransactions = computed(() => {
   // Filter by type
   if (filterType.value !== 'all') {
     result = result.filter(t => 
-      filterType.value === 'income' ? t.type === 'income' : t.ype === 'expense'
+      filterType.value === 'income' ? t.type === 'income' : t.type === 'expense'
     );
   }
 

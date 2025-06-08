@@ -60,7 +60,7 @@
               <p class="text-2xl font-semibold text-gray-800 mb-2">{{ formatCurrency(income) }}</p>
               <div class="flex items-center">
                 <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">
-                  ↑ 12.5%
+                  {{ calculatePercentage(income, expenses) >= 0 ? '↑' : '↓' }} {{ calculatePercentage(income, expenses) }}%
                 </span>
                 <span class="text-xs text-gray-500 ml-2">vs bulan lalu</span>
               </div>
@@ -81,7 +81,7 @@
               <p class="text-2xl font-semibold text-gray-800 mb-2">{{ formatCurrency(expenses) }}</p>
               <div class="flex items-center">
                 <span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800">
-                  ↓ 8.3%
+                  {{ calculatePercentage(income, expenses) >= 0 ? '↑' : '↓' }} {{ calculatePercentage(income, expenses) }}%
                 </span>
                 <span class="text-xs text-gray-500 ml-2">vs bulan lalu</span>
               </div>
@@ -112,6 +112,7 @@
               v-model="chartRange" 
               class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-100 focus:border-blue-300 bg-white"
             >
+              <option value="5">5 Hari</option>
               <option value="7">7 Hari</option>
               <option value="30">30 Hari</option>
               <option value="90">90 Hari</option>
@@ -173,7 +174,7 @@ const lastUpdated = ref(new Date().toLocaleDateString('id-ID', {
   hour: '2-digit',
   minute: '2-digit'
 }))
-const chartRange = ref('30')
+const chartRange = ref('5')
 
 
 const formatCurrency = (value) => {

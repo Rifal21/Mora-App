@@ -9,7 +9,7 @@
       </svg>
       <p class="text-center">Belum ada data transaksi<br>Mulai catat transaksi Anda untuk melihat grafik</p>
       <NuxtLink 
-        to="/transaksi/baru" 
+        to="/chat" 
         class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition flex items-center"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -265,6 +265,15 @@ export default {
 
     onMounted(async () => {
       await renderChart()
+      supabase
+  .channel('transactions')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, async (payload) => {
+    console.log('Realtime update:', payload);
+
+    // Re-render chart when transactions change
+    await renderChart();
+  })
+  .subscribe();
     })
 
     watch(() => props.range, async () => {

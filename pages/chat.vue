@@ -585,6 +585,11 @@ const updateFinancialSummary = async () => {
 // Load initial data
 onMounted(async () => {
   await loadChatHistory();
+    try {
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (error) {
+    console.log('Microphone permission denied:', error);
+  }
 });
 </script>
 
