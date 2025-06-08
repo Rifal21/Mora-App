@@ -4,6 +4,14 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+  app: {
+    head: {
+      title: 'Mora',
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/logo mora.png' }
+      ]
+    }
+  },
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [

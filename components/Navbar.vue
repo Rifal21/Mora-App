@@ -125,7 +125,7 @@
       aria-label="Open Chat"
       style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);"
     >
-      <IconCat class="w-10 h-10"/>
+      <IconMessageChatbot class="w-10 h-10"/>
     </button>
 
     <!-- Regular Navigation Items -->
@@ -219,7 +219,7 @@
               </div>
               <div v-else>
                 <!-- tampilkan loader atau kosong -->
-                <p>Memuat data pengguna...</p>
+                <p class="text-xs p-2">Memuat data pengguna...</p>
               </div>
             </div>
             
@@ -262,7 +262,7 @@
 </template>
 
 <script setup>
-import { IconLayoutSidebarLeftExpand , IconCat } from '@tabler/icons-vue';
+import { IconLayoutSidebarLeftExpand , IconCat, IconMessageChatbot, IconRobot } from '@tabler/icons-vue';
 import { useChatStore } from '~/stores/chat';
 import { useRouter, useRoute } from 'vue-router';
 const isMenuOpen = ref(false);
@@ -294,10 +294,15 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
 
+console.log(user)
 const toggleProfileModal = () => {
-  isProfileModalOpen.value = !isProfileModalOpen.value;
-  isProfileDropdownOpen.value = false;
-  isMenuOpen.value = false;
+  if(user === null) {
+    router.push('/login');
+  } else {
+    isProfileModalOpen.value = !isProfileModalOpen.value;
+    isProfileDropdownOpen.value = false;
+    isMenuOpen.value = false;
+  }
 };
 
 const toggleProfileDropdown = () => {
