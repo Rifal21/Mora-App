@@ -85,6 +85,22 @@
               class="chat-container h-96 overflow-y-auto p-4 bg-gray-50"
               ref="chatContainerRef"
             >
+              <div v-if="chatHistory.length === 0" class="text-start py-6">
+                <div class="flex flex-col items-center justify-center  rounded-full p-3 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <h2 class="text-xl font-bold text-gray-800 mb-1">Selamat datang di Mora AI</h2>
+                  <p class="text-gray-600 max-w-md mx-auto text-center">Saya asisten keuangan Anda. Tanyakan apa saja atau catat transaksi Anda.</p>
+                </div>
+                <p>Contoh Prompt:</p>
+                <ul class="list-disc list-inside">
+                  <li>Catat pengeluaran untuk makan 50000</li>
+                  <li>Belanja seratus ribu</li>
+                  <li>Gaji 12jt</li>
+                  <li>Cek Saldo</li>
+                </ul>
+              </div>
               <div
                 v-for="(message, index) in chatHistory"
                 :key="index"
