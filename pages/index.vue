@@ -291,7 +291,7 @@ Kategori: [nama kategori]
 Deskripsi: [deskripsi transaksi]
 
 Gunakan format di atas secara konsisten tanpa tanda bintang atau backtick.
-kemudian setelah format tersebut, tampilkan rekomendasi dan saran pengelolaan uang. jika pengguna tidak melakukan transaksi dan hanya meminta saran atau pendapat, jangan tampilkan format itu.`,
+kemudian setelah format tersebut, tampilkan rekomendasi dan saran pengelolaan uang. jika pengguna tidak melakukan transaksi dan hanya meminta saran atau pendapat, jangan tampilkan format itu. batasi jika pertanyaan atau inputan bukan seputar keuangan.`,
         },
         {
           role: "user",
