@@ -31,7 +31,7 @@
 
             <div 
               v-if="isProfileDropdownOpen" 
-              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-99999 border border-gray-200"
             >
               <div class="px-4 py-2 border-b border-gray-200" v-if="user">
                 <p class="text-sm font-medium text-gray-800">{{ user?.identities[0]?.identity_data?.name || '' }}</p>
